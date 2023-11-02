@@ -5,7 +5,7 @@ const router = require("./routes/routers")
 const helmet = require("helmet")
 const compression = require("compression")
 const morgan = require("morgan")
-
+const port =  process.env.PORT || 8000
 app.use(cors());
 app.use(express.json());
 app.use(helmet())
@@ -31,12 +31,12 @@ const multer = require('multer')
 app.use(multer({ destination: "images/" }).single("image"))
 
 const mongoose = require("mongoose");
-mongoose.connect('mongodb://127.0.0.1:27017/usersdb');
+mongoose.connect('mongodb://localhost:27017/usersdb');
 
 
 
 app.use("/", router.router)
-const server = app.listen(8000, () => {
+const server = app.listen(port, () => {
   console.log(`Server running at http://127.0.0.1:8000`);
 });
 
