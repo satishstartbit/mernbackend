@@ -6,7 +6,7 @@ const router = require("./routes/routers")
 const helmet = require("helmet")
 const compression = require("compression")
 const morgan = require("morgan")
-const port = process.env.PORT ||  8000
+const port = process.env.PORT || 8000
 app.use(cors());
 app.use(express.json());
 app.use(helmet())
@@ -14,6 +14,7 @@ app.use(compression())
 app.use(morgan("combined"))
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extends: true }))
+
 
 
 
@@ -36,6 +37,21 @@ app.use(multer({ destination: "images/" }).single("image"))
 const url = "mongodb+srv://satishchoudhary:7IikRK2oKcp91t5O@cluster0.6p4gzcx.mongodb.net/userdb?retryWrites=true&w=majority"
 const mongoose = require("mongoose");
 mongoose.connect(url);
+
+
+
+
+// const product = require("./models/product/product");
+// const products = mongoose.model('product', product.product);
+// products.find()
+//   .then((numproducts) => {
+//     console.log(numproducts);
+//   }
+// )
+
+
+
+
 
 
 

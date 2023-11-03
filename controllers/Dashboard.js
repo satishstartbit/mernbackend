@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 const product = require("../models/product/product");
 const products = mongoose.model('product', product.product);
 
-exports.dashboard = (req, res, next) => {
+exports.dashboard = async (req, res, next) => {
     const page = req.query.page || 1
     let totalitem;
-    products.find()
+    await products.find()
         .count()
         .then((numproducts) => {
             totalitem = numproducts
@@ -15,9 +15,10 @@ exports.dashboard = (req, res, next) => {
                 .limit(4)
         })
         .then(function (data) {
+            console.log(data);
             res.send(JSON.stringify({
-                data:data,
-                totalitem: Math.ceil(totalitem/4)
+                data: data,
+                totalitem: Math.ceil(totalitem / 4)
             }))
         })
 
