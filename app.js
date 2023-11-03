@@ -5,7 +5,7 @@ const router = require("./routes/routers")
 const helmet = require("helmet")
 const compression = require("compression")
 const morgan = require("morgan")
-const port =  process.env.PORT || 8000
+const port = process.env.PORT || 8000
 app.use(cors());
 app.use(express.json());
 app.use(helmet())
@@ -23,7 +23,7 @@ const { graphqlHTTP } = require('express-graphql');
 app.use("/graphql", graphqlHTTP({
   schema: graphqlschema,
   rootValue: graphqlresolvers,
-  graphiql:true
+  graphiql: true
 }))
 
 
@@ -31,7 +31,7 @@ const multer = require('multer')
 app.use(multer({ destination: "images/" }).single("image"))
 
 const mongoose = require("mongoose");
-mongoose.connect('mongodb://localhost:27017/usersdb');
+mongoose.connect(process.env.DATABASE);
 
 
 
