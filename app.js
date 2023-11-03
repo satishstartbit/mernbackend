@@ -1,3 +1,4 @@
+require("dotenv").config()
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -5,7 +6,7 @@ const router = require("./routes/routers")
 const helmet = require("helmet")
 const compression = require("compression")
 const morgan = require("morgan")
-const port = process.env.PORT || 8000
+const port = process.env.PORT ||  8000
 app.use(cors());
 app.use(express.json());
 app.use(helmet())
@@ -14,7 +15,8 @@ app.use(morgan("combined"))
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extends: true }))
 
-// console.log(process.env.MONGO_PASSWORD);
+console.log(process.env.PORT);
+
 
 const graphqlschema = require("./graphql/schema")
 const graphqlresolvers = require("./graphql/resolvers")
@@ -30,12 +32,16 @@ app.use("/graphql", graphqlHTTP({
 const multer = require('multer')
 app.use(multer({ destination: "images/" }).single("image"))
 
+
+const url = "mongodb+srv://satishchoudhary:7IikRK2oKcp91t5O@cluster0.6p4gzcx.mongodb.net/userdb?retryWrites=true&w=majority"
 const mongoose = require("mongoose");
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(url);
 
 
 
 app.use("/", router.router)
+
+
 const server = app.listen(port, () => {
   console.log(`Server running at http://127.0.0.1:8000`);
 });
