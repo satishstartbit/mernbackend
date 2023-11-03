@@ -15,7 +15,7 @@ app.use(morgan("combined"))
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extends: true }))
 
-console.log(process.env.PORT);
+
 
 
 const graphqlschema = require("./graphql/schema")
