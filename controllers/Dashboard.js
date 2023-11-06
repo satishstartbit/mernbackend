@@ -6,7 +6,7 @@ const products = mongoose.model('product', product.product);
 exports.dashboard = async (req, res, next) => {
     const page = req.query.page || 1
     let totalitem;
-    await products.find()
+    products.find()
         .count()
         .then((numproducts) => {
             totalitem = numproducts
@@ -16,7 +16,7 @@ exports.dashboard = async (req, res, next) => {
         })
         .then(function (data) {
             console.log(data);
-            res.send(JSON.stringify({
+             res.send(JSON.stringify({
                 data: data,
                 totalitem: Math.ceil(totalitem / 4)
             }))
