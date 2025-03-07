@@ -1,60 +1,56 @@
 name: Deploy Vite React App
- 
+
 on:
   push:
     branches:
-      - master
- 
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
- 
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
- 
-      - name: Deploy to remote server
+
+      - name: Deploy to EC2 server
         run: |
-          ssh -o StrictHostKeyChecking=no bitnami@13.127.116.15 << 'EOF'
-            # Ensure pm2 and a static file server are installed
+          ssh -o StrictHostKeyChecking=no ec2-user@13.127.116.15 << 'EOF'
+            # Ensure Node.js, pm2, and serve are installed
+            curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+            sudo yum install -y nodejs
             sudo npm install -g pm2 serve
- 
-            # Clone the repository if it doesn't already exist
+
+            # Navigate to the project directory
             if [ -d "React-Notes-app" ]; then
               cd React-Notes-app
-              git pull origin master
+              git pull origin main
             else
               git clone https://github.com/HarshAgrawalSB/React-Notes-app.git
               cd React-Notes-app
             fi
- 
-            # Build the project
+
+            # Install dependencies and build the project
             npm install
             npm run build
- 
-            # Kill existing npm processes (if any)
-            pkill -f 'npm run dev' || true
- 
-            # Kill processes on specific ports to avoid conflicts
+
+            # Kill any existing processes on port 5173 (or other ports if needed)
             lsof -t -i:5173 | xargs kill -9 || true
             lsof -t -i:5174 | xargs kill -9 || true
             lsof -t -i:5175 | xargs kill -9 || true
- 
-            # Start serving the built files with a static file server
-            pm2 start node_modules/.bin/serve --name "react-notes" -- dist
- 
-            serve -s dist -p 5173
- 
- 
+
+            # Serve the built files using pm2
+            pm2 start node_modules/.bin/serve --name "react-notes" -- -s dist -p 5173
+
             # Save the pm2 process list and configure it to restart on reboot
-            # pm2 save
-            # pm2 startup
- 
+            pm2 save
+            pm2 startup
+
             # Exit the SSH session
             exit
           EOF
