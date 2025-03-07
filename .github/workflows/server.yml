@@ -1,0 +1,60 @@
+name: Deploy Vite React App
+ 
+on:
+  push:
+    branches:
+      - master
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+ 
+      - name: Deploy to remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no bitnami@13.127.116.15 << 'EOF'
+            # Ensure pm2 and a static file server are installed
+            sudo npm install -g pm2 serve
+ 
+            # Clone the repository if it doesn't already exist
+            if [ -d "React-Notes-app" ]; then
+              cd React-Notes-app
+              git pull origin master
+            else
+              git clone https://github.com/HarshAgrawalSB/React-Notes-app.git
+              cd React-Notes-app
+            fi
+ 
+            # Build the project
+            npm install
+            npm run build
+ 
+            # Kill existing npm processes (if any)
+            pkill -f 'npm run dev' || true
+ 
+            # Kill processes on specific ports to avoid conflicts
+            lsof -t -i:5173 | xargs kill -9 || true
+            lsof -t -i:5174 | xargs kill -9 || true
+            lsof -t -i:5175 | xargs kill -9 || true
+ 
+            # Start serving the built files with a static file server
+            pm2 start node_modules/.bin/serve --name "react-notes" -- dist
+ 
+            serve -s dist -p 5173
+ 
+ 
+            # Save the pm2 process list and configure it to restart on reboot
+            # pm2 save
+            # pm2 startup
+ 
+            # Exit the SSH session
+            exit
+          EOF
